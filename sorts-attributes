@@ -1,0 +1,28 @@
+This function sorts the 'pa_sizes' attribute terms according to a predefined order. If a term is not found in the predefined order, it falls back to sorting numerically. The function is hooked into WooCommerce to apply this custom sorting whenever product terms are retrieved.
+
+function custom_attribute_sort_order_size( $terms, $post_id, $taxonomy ) {
+    if ( $taxonomy == 'pa_sizes' ) {
+        $order = array( 'XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL' );
+
+        usort( $terms, function ( $a, $b ) use ( $order ) {
+            // Check if terms are objects or strings
+            $a_name = is_object($a) ? $a->name : $a;
+            $b_name = is_object($b) ? $b->name : $b;
+
+            $a_index = array_search( $a_name, $order );
+            $b_index = array_search( $b_name, $order );
+
+            if ( $a_index !== false && $b_index !== false ) {
+                return $a_index <=> $b_index;
+            }
+
+            $a_value = preg_replace( '/[^0-9.]/', '', $a_name );
+            $b_value = preg_replace( '/[^0-9.]/', '', $b_name );
+
+            return $a_value <=> $b_value;
+        } );
+    }
+
+    return $terms;
+}
+add_filter( 'woocommerce_get_product_terms', 'custom_attribute_sort_order_size', 10, 3 );
