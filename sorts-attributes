@@ -26,3 +26,22 @@ function custom_attribute_sort_order_size( $terms, $post_id, $taxonomy ) {
     return $terms;
 }
 add_filter( 'woocommerce_get_product_terms', 'custom_attribute_sort_order_size', 10, 3 );
+
+
+This Function sorts alphabetically
+
+function custom_attribute_sort_order_standard_finish( $terms, $post_id, $taxonomy ) {
+    if ( $taxonomy == 'pa_standard-finish' ) {
+        usort( $terms, function ( $a, $b ) {
+            // Check if terms are objects or strings
+            $a_name = is_object($a) ? $a->name : $a;
+            $b_name = is_object($b) ? $b->name : $b;
+
+            // Use strnatcasecmp for natural order case-insensitive comparison
+            return strnatcasecmp( $a_name, $b_name );
+        } );
+    }
+
+    return $terms;
+}
+add_filter( 'woocommerce_get_product_terms', 'custom_attribute_sort_order_standard_finish', 10, 3 );
