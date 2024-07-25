@@ -45,3 +45,32 @@ function custom_attribute_sort_order_standard_finish( $terms, $post_id, $taxonom
     return $terms;
 }
 add_filter( 'woocommerce_get_product_terms', 'custom_attribute_sort_order_standard_finish', 10, 3 );
+
+
+
+
+The reorder_product_attributes function takes the attributes of a WooCommerce variable product and reorders them based on a specified order. If the product is not a variable product, it returns the attributes unchanged. The specified order in this example prioritizes pa_standard-finish and pa_special-finish, placing them at the beginning of the array, with any remaining attributes appended afterwards.
+
+// Order Standard before Special Finish
+add_filter('woocommerce_product_get_attributes', 'reorder_product_attributes', 10, 2);
+
+function reorder_product_attributes($attributes, $product) {
+    if (!$product->is_type('variable')) {
+        return $attributes;
+    }
+
+    $desired_order = array('pa_standard-finish', 'pa_special-finish');
+    $reordered_attributes = array();
+
+    foreach ($desired_order as $attr_name) {
+        if (isset($attributes[$attr_name])) {
+            $reordered_attributes[$attr_name] = $attributes[$attr_name];
+            unset($attributes[$attr_name]);
+        }
+    }
+
+    // Add any remaining attributes
+    $reordered_attributes += $attributes;
+
+    return $reordered_attributes;
+}
